@@ -94,26 +94,26 @@ with tab1:
         c1, c2 = st.columns(2)
         with c1:
             st.slider(
-                "Data sensitivity (0–4)",
+                "Data sensitivity (0-4)",
                 0, 4, int(ctx_preview["data_sensitivity"]),
                 help="How sensitive is the data? (e.g., beneficiaries, donor details, finance)",
                 key="data_sens"
             )
             st.slider(
-                "Financial exposure (0–4)",
+                "Financial exposure (0-4)",
                 0, 4, int(ctx_preview["financial_exposure"]),
                 help="How much financial loss could result from an incident?",
                 key="fin_exp"
             )
         with c2:
             st.slider(
-                "Operational dependency (0–4)",
+                "Operational dependency (0-4)",
                 0, 4, int(ctx_preview["operational_dependency"]),
                 help="How badly would disruption affect daily operations?",
                 key="ops_dep"
             )
             st.slider(
-                "Reputational risk (0–4)",
+                "Reputational risk (0-4)",
                 0, 4, int(ctx_preview["reputational_risk"]),
                 help="How damaging would loss of trust be (donors, community, regulators)?",
                 key="rep_risk"
@@ -165,18 +165,18 @@ with tab2:
             st.caption(f"Last calculated: {st.session_state.last_calculated}")
 
         st.subheader("Cyber risk exposure by domain (higher = weaker)")
-        st.caption("This chart visualises weakness = 4 − maturity. Higher weakness contributes to higher likelihood.")
+        st.caption("This chart visualises weakness = 4 - maturity. Higher weakness contributes to higher likelihood.")
 
         domain_df = pd.DataFrame.from_dict(
             result["domain_scores"],
             orient="index",
-            columns=["Maturity (0–4)"]
+            columns=["Maturity (0-4)"]
         )
         domain_df.index.name = "Domain"
 
         weakness_df = domain_df.copy()
-        weakness_df["Weakness (0–4)"] = 4 - weakness_df["Maturity (0–4)"]
-        weakness_df = weakness_df[["Weakness (0–4)"]]
+        weakness_df["Weakness (0-4)"] = 4 - weakness_df["Maturity (0-4)"]
+        weakness_df = weakness_df[["Weakness (0-4)"]]
 
         st.bar_chart(weakness_df)
 
@@ -235,8 +235,8 @@ This prototype helps UK charities estimate cyber risk using:
 - **NIST SP 800-30-inspired** logic: *Risk = Likelihood × Impact*
 
 **How to interpret results**
-- *Maturity (0–4)* reflects how much a control is in place.
-- *Weakness = 4 − maturity* (higher weakness increases likelihood).
+- *Maturity (0-4)* reflects how much a control is in place.
+- *Weakness = 4 - maturity* (higher weakness increases likelihood).
 - *Impact* is based on charity context: sensitivity, operations, finance, reputation.
 
 **Limitations (being honest)**

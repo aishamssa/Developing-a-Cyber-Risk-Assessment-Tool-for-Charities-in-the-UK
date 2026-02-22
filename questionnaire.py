@@ -1,8 +1,16 @@
-''' Answer Mapping and Data Preparation
-This module contains the logic that transforms human-readable responseS into numerical or categorical values used by the scoring engine. 
-It also groups questions by cybersecurity domain (e.g., Identify, Protect, Detect, Respond, Recover), reflecting the structure of the NIST CSF. 
-The module ensures that user input is interpreted consistently and accurately, which is essential in a risk-assessment tool where subjective answers must be converted into objective scoring inputs. 
-This script essentially acts as the bridge between the qualitative questionnaire and the quantitative scoring model. '''
+# questionnaire.py
+# Questionnaire model for the tool
+# - Defines the 0–4 maturity scale
+# - Defines question banks per NIST CSF function
+# - Exposes QUESTIONNAIRE and DOMAIN_QUESTION_IDS for the UI + scoring engine
+
+SCALE_LABELS = {
+    0: "Not in place (no evidence, not done)",
+    1: "Ad hoc (done sometimes, inconsistent, depends on individuals)",
+    2: "Partial (some controls exist, but gaps + not standardised)",
+    3: "Mostly (implemented for most areas, minor gaps remain)",
+    4: "Fully (consistent, documented, reviewed/improved)",
+}
 
 # -------------------------
 # IDENTIFY DOMAIN

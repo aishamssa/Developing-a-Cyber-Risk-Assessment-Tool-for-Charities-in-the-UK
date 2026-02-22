@@ -7,10 +7,11 @@ import streamlit as st
 import pandas as pd
 
 from ux import apply_styles, hero_card
-from questionnaire import QUESTIONNAIRE, DOMAIN_QUESTION_IDS
+from questionnaire import QUESTIONNAIRE, DOMAIN_QUESTION_IDS, SCALE_LABELS
 from charity_profile import default_charity_context
 from data_loader import context_templates
 from scoring import run_assessment
+
 
 
 # -------------------------
@@ -65,7 +66,7 @@ responses = {}
 for domain, questions in QUESTIONNAIRE.items():
     for q in questions:
         if q["id"] not in st.session_state:
-            st.session_state[q["id"]] = 2  # default "partially in place"
+            st.session_state[q["id"]] = 0  # default "not in place" to avoid biased demo outputs
         responses[q["id"]] = st.session_state[q["id"]]
 
 
@@ -122,16 +123,23 @@ with tab1:
     st.divider()
 
     st.subheader("Questionnaire (0 = not in place, 4 = fully in place)")
+    st.caption("Scores represent organisational maturity (not individual staff performance).")
+
+    with st.expander("What do the scores mean? (0-4)", expanded=False):
+        for k in range(0, 5):
+            st.write(f"**{k}** — {SCALE_LABELS[k]}")
 
     for domain, questions in QUESTIONNAIRE.items():
         with st.expander(domain, expanded=True):
             for q in questions:
-                st.slider(
+                value = st.slider(
                     f"{q['id']} - {q['question']}",
                     0, 4,
                     value=int(st.session_state[q["id"]]),
+                    step=1,
                     key=q["id"]
                 )
+                st.caption(f"**Selected:** {value} — {SCALE_LABELS[value]}")
 
 
 # -------------------------

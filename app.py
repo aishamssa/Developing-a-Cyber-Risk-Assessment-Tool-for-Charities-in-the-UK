@@ -189,7 +189,6 @@ with tab2:
         weakness_df = weakness_df[["Weakness (0-4)"]]
         
 
-        st.bar_chart(weakness_df)
         chart_df = weakness_df.reset_index()
         chart_df.columns = ["Domain", "Weakness"]
         

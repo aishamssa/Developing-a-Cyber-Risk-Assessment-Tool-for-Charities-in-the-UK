@@ -5,12 +5,14 @@
 import json
 import streamlit as st
 import pandas as pd
+import altair as alt
 
 from ux import apply_styles, hero_card
 from questionnaire import QUESTIONNAIRE, DOMAIN_QUESTION_IDS, SCALE_LABELS
 from charity_profile import default_charity_context
 from data_loader import context_templates
 from scoring import run_assessment
+
 
 
 
@@ -185,8 +187,29 @@ with tab2:
         weakness_df = domain_df.copy()
         weakness_df["Weakness (0-4)"] = 4 - weakness_df["Maturity (0-4)"]
         weakness_df = weakness_df[["Weakness (0-4)"]]
+        
 
         st.bar_chart(weakness_df)
+        chart_df = weakness_df.reset_index()
+        chart_df.columns = ["Domain", "Weakness"]
+        
+        chart = (
+            alt.Chart(chart_df)
+            .mark_bar()
+            .encode(
+                x=alt.X("Domain:N", sort="-y"),
+                y=alt.Y("Weakness:Q", scale=alt.Scale(domain=[0, 4])),
+                color=alt.Color(
+                    "Weakness:Q",
+                    scale=alt.Scale(domain=[0, 1.5, 2.5, 3.5, 4],
+                                    range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#7F1D1D"]),
+                                    legend=alt.Legend(title="Weakness")
+                                    ),
+                                    tooltip=["Domain", "Weakness"]
+                                    )
+                                )
+        st.altair_chart(chart, use_container_width=True)
+
 
         combined_df = domain_df.join(weakness_df)
         st.dataframe(combined_df.style.format("{:.2f}"), use_container_width=True)

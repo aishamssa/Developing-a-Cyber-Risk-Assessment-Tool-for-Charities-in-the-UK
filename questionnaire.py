@@ -1,10 +1,7 @@
 # questionnaire.py
-# Questionnaire model for the tool
-# - Defines the 0–4 maturity scale
-# - Defines question banks per NIST CSF function
-# - Exposes QUESTIONNAIRE and DOMAIN_QUESTION_IDS for the UI + scoring engine
-
-# questionnaire.py
+# Defines the questionnaire structure and maturity scale used by the tool.
+# Questions are organised according to the NIST CSF domains
+# (Identify, Protect, Detect, Respond, Recover).
 
 SCALE_LABELS = {
     0: "Not in place (no evidence, not done)",

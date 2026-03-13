@@ -6,7 +6,7 @@ Goal: To design and evaluate a evidence-based risk assessment tool that helps UK
 2.	My second aim to improve my technical and analytical understanding of risk assessment methodologies by implementing the NIST Cybersecurity Framework and NIST SP 800-30 scoring logic.
 
 # Objective – 
-1.	Conduct comparative research on cybersecurity frameworks (NIST CSF, ISO 27005, CIS Controls, NCSC guidance) and development environments (Python vs Java, Streamlit vs Flask) to identify the most practical and ethical appr oach for UK charities
+1.	Conduct comparative research on cybersecurity frameworks (NIST CSF, ISO 27005, CIS Controls, NCSC guidance) and development environments (Python vs Java, Streamlit vs Flask) to identify the most practical and ethical approaches for UK charities
 2.	Design a non-technical risk-assessment questionnaire structured around NIST CSF domains (Identify, Protect, Detect, Respond, Recover).
 3.	Implement the questionnaire and NIST SP 800-30 risk-scoring logic using Python and Streamlit.
 4.	Test my risk assessment tool using synthetic charity profiles to assess reliability, usability, and logical consistency.

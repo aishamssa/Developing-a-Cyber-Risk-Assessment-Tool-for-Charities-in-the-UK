@@ -1,18 +1,13 @@
-# NIST-Aligned Risk Calculation Engine
-# This script contains the core mathematical and logical functions of your tool. It operationalises the NIST SP 800-30 risk model by computing likelihood, impact, and an overall risk score. 
-# The scoring engine will eventually integrate domain weights, question importance, and customised recommendations. 
-# Early in the project, this script will simply apply basic formulas to demonstrate system functionality. 
-# As the implementation matures, the scoring logic will be refined and documented. 
-# This module represents the analytical heart of the project and demonstrates your ability to translate theoretical cybersecurity frameworks into a functioning computational system.
-
-
 # scoring.py
-# NIST SP 800-30 inspired scoring engine (likelihood + impact -> risk)
-# This module operationalises your risk logic:
-# - Questionnaire maturity (0-4) approximates control strength per CSF function
-# - Likelihood is higher when maturity is lower (more weaknesses)
-# - Impact is derived from organisational context (data sensitivity, ops dependency etc.)
-# Risk score = Likelihood × Impact
+# Risk scoring engine for the Cyber Risk Assessment Tool.
+# Implements a simplified NIST SP 800-30 inspired model:
+# Risk = Likelihood x Impact.
+#
+# Likelihood is derived from questionnaire maturity scores
+# across the NIST CSF domains (Identify, Protect, Detect,
+# Respond, Recover). Impact is estimated from organisational
+# context factors such as data sensitivity, operational
+# dependency, financial exposure, and reputational risk.
 
 MAX_SCORE = 4
 LOW_RISK_THRESHOLD = 4

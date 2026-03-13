@@ -69,39 +69,38 @@ with tab1:
     st.caption("Tip: answer honestly. This is an indicative self-assessment, not a compliance audit.")
 
     st.subheader("Charity context (Impact inputs)")
-with st.container(border=True):
-    ctx_preview = default_charity_context()
+    with st.container(border=True):
+        ctx_preview = default_charity_context()
 
-    st.text_input("Charity name", value=ctx_preview["charity_name"], key="charity_name")
+        st.text_input("Charity name", value=ctx_preview["charity_name"], key="charity_name")
 
-    c1, c2 = st.columns(2)
-    with c1:
-        st.slider(
-            "Data sensitivity (0-4)",
-            0, 4, int(ctx_preview["data_sensitivity"]),
-            help="How sensitive is the data? (e.g., beneficiaries, donor details, finance)",
-            key="data_sens"
-        )
-        st.slider(
-            "Financial exposure (0-4)",
-            0, 4, int(ctx_preview["financial_exposure"]),
-            help="How much financial loss could result from an incident?",
-            key="fin_exp"
-        )
-    with c2:
-        st.slider(
-            "Operational dependency (0-4)",
-            0, 4, int(ctx_preview["operational_dependency"]),
-            help="How badly would disruption affect daily operations?",
-            key="ops_dep"
-        )
-        st.slider(
-            "Reputational risk (0-4)",
-            0, 4, int(ctx_preview["reputational_risk"]),
-            help="How damaging would loss of trust be (donors, community, regulators)?",
-            key="rep_risk"
-        )
-        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.slider(
+                "Data sensitivity (0-4)",
+                0, 4, int(ctx_preview["data_sensitivity"]),
+                help="How sensitive is the data? (e.g., beneficiaries, donor details, finance)",
+                key="data_sens"
+            )
+            st.slider(
+                "Financial exposure (0-4)",
+                0, 4, int(ctx_preview["financial_exposure"]),
+                help="How much financial loss could result from an incident?",
+                key="fin_exp"
+            )
+        with c2:
+            st.slider(
+                "Operational dependency (0-4)",
+                0, 4, int(ctx_preview["operational_dependency"]),
+                help="How badly would disruption affect daily operations?",
+                key="ops_dep"
+            )
+            st.slider(
+                "Reputational risk (0-4)",
+                0, 4, int(ctx_preview["reputational_risk"]),
+                help="How damaging would loss of trust be (donors, community, regulators)?",
+                key="rep_risk"
+            )
 
     st.divider()
 

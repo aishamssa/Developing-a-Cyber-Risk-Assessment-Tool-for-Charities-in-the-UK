@@ -14,6 +14,39 @@
 # - Impact is derived from organisational context (data sensitivity, ops dependency etc.)
 # Risk score = Likelihood × Impact
 
+MAX_SCORE = 4
+LOW_RISK_THRESHOLD = 4
+MEDIUM_RISK_THRESHOLD = 9
+TOP_WEAK_DOMAINS = 2
+
+DOMAIN_RECOMMENDATIONS = {
+    "Identify": [
+        "Create and maintain a simple asset and data inventory covering key accounts, devices, systems, and sensitive information.",
+        "Define and review access responsibilities so the charity knows who can access which systems and data.",
+        "Document the use of personal devices and external accounts where they are used to access charity resources."
+    ],
+    "Protect": [
+        "Apply stronger account protections, including unique accounts, password guidance, and multi-factor authentication where available.",
+        "Introduce short, repeatable phishing-awareness guidance for staff and volunteers.",
+        "Use access controls, permissions, and secure storage practices to reduce exposure of donor, beneficiary, and financial data."
+    ],
+    "Detect": [
+        "Enable basic monitoring and alerting for important accounts, especially email and cloud platforms.",
+        "Define simple checking procedures when suspicious activity is reported, such as reviewing logins or resetting passwords.",
+        "Establish a clear and visible reporting route for suspected cyber-security issues."
+    ],
+    "Respond": [
+        "Develop a short incident response checklist covering phishing, account compromise, and data-loss scenarios.",
+        "Assign a named incident coordinator who can organise actions and escalation during an event.",
+        "Record incident actions and decisions to support evidence, review, and learning."
+    ],
+    "Recover": [
+        "Ensure important data is backed up and that backups can be accessed when needed.",
+        "Define how essential services would be restored after an incident, including realistic recovery priorities.",
+        "Review incidents and near-misses after they occur and update practices accordingly."
+    ]
+}
+
 def calculate_domain_scores(responses, domain_question_ids):
     """
     Calculates average maturity per CSF domain.
@@ -29,9 +62,9 @@ def calculate_domain_scores(responses, domain_question_ids):
 
 def calculate_likelihood(domain_scores, domain_weights=None):
     """
-    Converts maturity into likelihood (0-4).
-    Weakness = 4 - maturity.
-    Weighted average weakness = likelihood estimate.
+    Converts maturity into a likelihood estimate on the same scale as the questionnaire.
+    Weakness is calculated as MAX_SCORE minus maturity.
+    A weighted average of weakness values produces the likelihood score.
     """
     if domain_weights is None:
         domain_weights = {d: 1 for d in domain_scores.keys()}
@@ -40,7 +73,7 @@ def calculate_likelihood(domain_scores, domain_weights=None):
     weighted_weakness = 0
 
     for domain, maturity in domain_scores.items():
-        weakness = 4 - maturity
+        weakness = MAX_SCORE - maturity
         weighted_weakness += weakness * domain_weights.get(domain, 1)
 
     likelihood = weighted_weakness / total_weight
@@ -49,8 +82,8 @@ def calculate_likelihood(domain_scores, domain_weights=None):
 
 def calculate_impact(context):
     """
-    Impact magnitude estimated from charity context.
-    Values are 0-4, averaged to produce 0-4 impact score.
+    Estimates impact from charity context factors.
+    All context values use the same 0- MAX_SCORE scale and are averaged.
     """
     factors = [
         context["data_sensitivity"],
@@ -64,21 +97,20 @@ def calculate_impact(context):
 
 def calculate_risk(likelihood, impact):
     """
-    Overall risk score (0-16) since both are 0-4.
+    Calculates the overall risk score as likelihood x impact.
     """
     return round(likelihood * impact, 2)
 
 
 def risk_band(risk_score):
     """
-    Simple banding for user-friendly outputs.
+    Categorises risk score into user-friendly bands.
     """
-    if risk_score < 4:
+    if risk_score < LOW_RISK_THRESHOLD:
         return "Low"
-    elif risk_score < 9:
+    elif risk_score < MEDIUM_RISK_THRESHOLD:
         return "Medium"
-    else:
-        return "High"
+    return "High"
 
 
 def rank_weak_domains(domain_scores):
@@ -87,7 +119,7 @@ def rank_weak_domains(domain_scores):
     """
     weaknesses = []
     for domain, score in domain_scores.items():
-        weaknesses.append((domain, round(4 - score, 2)))
+        weaknesses.append((domain, round(MAX_SCORE - score, 2)))
 
     weaknesses.sort(key=lambda x: x[1], reverse=True)
     return weaknesses
@@ -95,34 +127,14 @@ def rank_weak_domains(domain_scores):
 
 def generate_recommendations(domain_scores):
     """
-    Lightweight recommendations tied to CSF functions.
-    Picks the 2 weakest domains and suggests practical next steps.
+    Generate practical recommendations based on the weakest domains.
     """
     ranked = rank_weak_domains(domain_scores)
-    weakest_domains = [ranked[0][0], ranked[1][0]] if len(ranked) >= 2 else [ranked[0][0]]
+    weakest_domains = [domain for domain, _ in ranked[:TOP_WEAK_DOMAINS]]
 
     recs = []
-
-    for d in weakest_domains:
-        if d == "Identify":
-            recs.append("Create a simple inventory of key accounts, devices, and the types of sensitive data held (donor/beneficiary/finance).")
-            recs.append("Clarify who can access what (even a basic spreadsheet of roles and access helps).")
-
-        elif d == "Protect":
-            recs.append("Enable multi-factor authentication on email, cloud storage and finance systems.")
-            recs.append("Introduce short phishing awareness guidance for staff/volunteers and basic device hygiene (screen locks, updates).")
-
-        elif d == "Detect":
-            recs.append("Set up basic alerts (e.g., email login alerts) and encourage reporting of suspicious emails immediately.")
-            recs.append("Check key accounts weekly for unusual activity (manual monitoring is still monitoring).")
-
-        elif d == "Respond":
-            recs.append("Write a one-page incident checklist: who to contact, how to reset passwords, how to isolate affected accounts.")
-            recs.append("Decide who leads incident response (named person/role) and when to escalate to external IT help.")
-
-        elif d == "Recover":
-            recs.append("Ensure backups exist, are protected, and test a basic restore process (even once a month).")
-            recs.append("After any incident/near-miss, record what happened and one improvement action for next time.")
+    for domain in weakest_domains:
+        recs.extend(DOMAIN_RECOMMENDATIONS.get(domain, []))
 
     return recs
 

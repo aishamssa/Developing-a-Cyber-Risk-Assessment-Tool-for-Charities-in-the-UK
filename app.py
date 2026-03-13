@@ -14,8 +14,6 @@ from data_loader import context_templates
 from scoring import run_assessment
 
 
-
-
 # -------------------------
 # Page setup
 # -------------------------
@@ -32,18 +30,15 @@ if "result" not in st.session_state:
 if "last_calculated" not in st.session_state:
     st.session_state.last_calculated = None
 
-
 # -------------------------
 # Tabs (main navigation)
 # -------------------------
 tab1, tab2, tab3 = st.tabs(["Assessment", "Results", "About"])
-
 templates = context_templates()
 
 
 # -------------------------
 # Helper: build context from session state
-# (so Results always uses latest inputs)
 # -------------------------
 def build_ctx_from_state() -> dict:
     ctx_local = default_charity_context()
@@ -73,7 +68,7 @@ for domain, questions in QUESTIONNAIRE.items():
 
 
 # -------------------------
-# TAB 1: Assessment (context + questionnaire)
+# TAB 1: Assessment
 # -------------------------
 with tab1:
     st.header("Assessment")
@@ -87,7 +82,6 @@ with tab1:
             key="template_choice"
         )
 
-        # Start with defaults, then apply template if chosen
         ctx_preview = default_charity_context()
         if template_choice != "Custom (enter your own)":
             ctx_preview.update(templates[template_choice])
@@ -145,7 +139,7 @@ with tab1:
 
 
 # -------------------------
-# TAB 2: Results (scoring + outputs)
+# TAB 2: Results
 # -------------------------
 with tab2:
     st.header("Results")
@@ -187,11 +181,10 @@ with tab2:
         weakness_df = domain_df.copy()
         weakness_df["Weakness (0-4)"] = 4 - weakness_df["Maturity (0-4)"]
         weakness_df = weakness_df[["Weakness (0-4)"]]
-        
 
         chart_df = weakness_df.reset_index()
         chart_df.columns = ["Domain", "Weakness"]
-        
+
         chart = (
             alt.Chart(chart_df)
             .mark_bar()
@@ -200,15 +193,17 @@ with tab2:
                 y=alt.Y("Weakness:Q", scale=alt.Scale(domain=[0, 4])),
                 color=alt.Color(
                     "Weakness:Q",
-                    scale=alt.Scale(domain=[0, 1.5, 2.5, 3.5, 4],
-                                    range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#7F1D1D"]),
-                                    legend=alt.Legend(title="Weakness")
-                                    ),
-                                    tooltip=["Domain", "Weakness"]
-                                    )
-                                )
-        st.altair_chart(chart, use_container_width=True)
+                    scale=alt.Scale(
+                        domain=[0, 1.5, 2.5, 3.5, 4],
+                        range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#7F1D1D"],
+                    ),
+                    legend=alt.Legend(title="Weakness"),
+                ),
+                tooltip=["Domain:N", "Weakness:Q"],
+            )
+        )
 
+        st.altair_chart(chart, use_container_width=True)
 
         combined_df = domain_df.join(weakness_df)
         st.dataframe(combined_df.style.format("{:.2f}"), use_container_width=True)
@@ -259,19 +254,64 @@ with tab3:
     st.header("About this tool")
     st.write(
         """
-This prototype helps UK charities estimate cyber risk using:
+This prototype was developed to support **small UK charities** in identifying cyber risk in a way that is structured, accessible, and practical for organisations with limited technical resources.
 
-- **NIST CSF 2.0** domains (Identify, Protect, Detect, Respond, Recover) to structure the questionnaire  
-- **NIST SP 800-30-inspired** logic: *Risk = Likelihood × Impact*
+Many charities face growing exposure to threats such as **phishing, credential compromise, ransomware, and unauthorised access to donor or beneficiary data**, yet often operate without dedicated cyber-security staff. In these environments, complex enterprise frameworks may be difficult to apply directly. This tool therefore translates key cyber-risk concepts into a lightweight self-assessment that can support early prioritisation of improvements.
 
-**How to interpret results**
-- *Maturity (0-4)* reflects how much a control is in place.
-- *Weakness = 4 - maturity* (higher weakness increases likelihood).
-- *Impact* is based on charity context: sensitivity, operations, finance, reputation.
+### Purpose of the tool
+The aim of the tool is to help a charity, trustee, senior manager, or assessor form an indicative view of the organisation’s current cyber-risk posture by combining:
+- **control maturity** across five core cyber-security functions
+- **organisational impact context**
+- a simple **risk scoring model** that turns responses into prioritised outputs
 
-**Limitations (being honest)**
-- Answers are self-reported (so results depend on honest inputs).
-- The scoring model is intentionally lightweight to stay usable for small charities.
-- Future work could add domain weights, red-flag rules (e.g., “no backups”), and deeper validation/testing.
+### Framework basis
+The questionnaire is structured around the five core functions of **NIST CSF 2.0**:
+- **Identify**
+- **Protect**
+- **Detect**
+- **Respond**
+- **Recover**
+
+These functions were used as a conceptual structure for the questionnaire rather than as a formal compliance checklist.
+
+The scoring logic is **inspired by NIST SP 800-30**, using the principle that:
+
+**Risk = Likelihood x Impact**
+
+In this prototype:
+- **maturity** is scored from 0-4
+- **weakness = 4 - maturity**
+- higher weakness contributes to higher **likelihood**
+- **impact** is estimated from charity context: data sensitivity, operational dependency, financial exposure, and reputational risk
+
+### Why this tool is organisational rather than employee-based
+The questionnaire is written from an **organisational assessment perspective**. It is intended to reflect the maturity of charity-wide controls, responsibilities, and practices rather than the confidence or awareness of a single staff member.
+
+This decision was made because, in small and scaling charities, responses can vary significantly between staff and volunteers, especially where **BYOD**, informal processes, and turnover are common. An organisational perspective improves consistency and aligns more closely with governance-focused risk assessment.
+
+### Why Streamlit was used
+**Streamlit** was selected because it supports rapid prototyping, clear visual presentation, and interactive input collection with relatively low development overhead. This made it suitable for building a lightweight academic prototype that could display scores, charts, rankings, and downloadable evidence in a simple browser-based interface.
+
+### How to interpret results
+- **0–4 maturity scale** indicates how far a control is in place
+- lower maturity produces higher weakness
+- higher weakness increases estimated likelihood
+- the weakest domains are ranked to help prioritise improvement efforts
+
+### Limitations
+This tool is an **indicative prototype**, not a compliance audit or formal certification mechanism.
+Its limitations include:
+- self-reported inputs
+- simplified scoring logic
+- equal weighting across domains in the current version
+- recommendations that are rule-based rather than fully context-adaptive
+
+### Future development
+Future work could extend the tool by:
+- adding **domain weighting**
+- introducing **red-flag rules** for critical missing controls
+- supporting **multiple respondents within a charity**
+- aggregating responses to highlight perception gaps and governance inconsistencies
+- strengthening automated testing and recommendation personalisation
 """
     )

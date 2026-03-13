@@ -264,6 +264,14 @@ The aim of the tool is to help a charity, trustee, senior manager, or assessor f
 - **organisational impact context**
 - a simple **risk scoring model** that turns responses into prioritised outputs
 
+### Who should complete this assessment
+This assessment is intended to be completed by someone with a **broad understanding of the organisation’s operations and systems**. This may include a trustee, senior manager, operations lead, or an external assessor supporting cyber-risk review.
+
+The questions focus on **organisational practices rather than individual staff knowledge**. Where exact information is not available, respondents should provide a **best effort estimate** based on current processes, documentation, and operational understanding.
+
+The goal of the tool is **not to produce a precise compliance score**, but to highlight areas where cyber-security maturity may require further attention.
+
+
 ### Framework basis
 The questionnaire is structured around the five core functions of **NIST CSF 2.0**:
 - **Identify**

@@ -10,7 +10,6 @@ import altair as alt
 from ux import apply_styles, hero_card
 from questionnaire import QUESTIONNAIRE, DOMAIN_QUESTION_IDS, SCALE_LABELS
 from charity_profile import default_charity_context
-from data_loader import context_templates
 from scoring import run_assessment
 
 
@@ -34,7 +33,6 @@ if "last_calculated" not in st.session_state:
 # Tabs (main navigation)
 # -------------------------
 tab1, tab2, tab3 = st.tabs(["Assessment", "Results", "About"])
-templates = context_templates()
 
 
 # -------------------------
@@ -42,10 +40,6 @@ templates = context_templates()
 # -------------------------
 def build_ctx_from_state() -> dict:
     ctx_local = default_charity_context()
-
-    chosen = st.session_state.get("template_choice", "Custom (enter your own)")
-    if chosen != "Custom (enter your own)" and chosen in templates:
-        ctx_local.update(templates[chosen])
 
     ctx_local["charity_name"] = st.session_state.get("charity_name", ctx_local["charity_name"])
     ctx_local["data_sensitivity"] = st.session_state.get("data_sens", ctx_local["data_sensitivity"])
@@ -75,46 +69,39 @@ with tab1:
     st.caption("Tip: answer honestly. This is an indicative self-assessment, not a compliance audit.")
 
     st.subheader("Charity context (Impact inputs)")
-    with st.container(border=True):
-        template_choice = st.selectbox(
-            "Choose a template (optional)",
-            ["Custom (enter your own)"] + list(templates.keys()),
-            key="template_choice"
+with st.container(border=True):
+    ctx_preview = default_charity_context()
+
+    st.text_input("Charity name", value=ctx_preview["charity_name"], key="charity_name")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.slider(
+            "Data sensitivity (0-4)",
+            0, 4, int(ctx_preview["data_sensitivity"]),
+            help="How sensitive is the data? (e.g., beneficiaries, donor details, finance)",
+            key="data_sens"
         )
-
-        ctx_preview = default_charity_context()
-        if template_choice != "Custom (enter your own)":
-            ctx_preview.update(templates[template_choice])
-
-        st.text_input("Charity name", value=ctx_preview["charity_name"], key="charity_name")
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.slider(
-                "Data sensitivity (0-4)",
-                0, 4, int(ctx_preview["data_sensitivity"]),
-                help="How sensitive is the data? (e.g., beneficiaries, donor details, finance)",
-                key="data_sens"
-            )
-            st.slider(
-                "Financial exposure (0-4)",
-                0, 4, int(ctx_preview["financial_exposure"]),
-                help="How much financial loss could result from an incident?",
-                key="fin_exp"
-            )
-        with c2:
-            st.slider(
-                "Operational dependency (0-4)",
-                0, 4, int(ctx_preview["operational_dependency"]),
-                help="How badly would disruption affect daily operations?",
-                key="ops_dep"
-            )
-            st.slider(
-                "Reputational risk (0-4)",
-                0, 4, int(ctx_preview["reputational_risk"]),
-                help="How damaging would loss of trust be (donors, community, regulators)?",
-                key="rep_risk"
-            )
+        st.slider(
+            "Financial exposure (0-4)",
+            0, 4, int(ctx_preview["financial_exposure"]),
+            help="How much financial loss could result from an incident?",
+            key="fin_exp"
+        )
+    with c2:
+        st.slider(
+            "Operational dependency (0-4)",
+            0, 4, int(ctx_preview["operational_dependency"]),
+            help="How badly would disruption affect daily operations?",
+            key="ops_dep"
+        )
+        st.slider(
+            "Reputational risk (0-4)",
+            0, 4, int(ctx_preview["reputational_risk"]),
+            help="How damaging would loss of trust be (donors, community, regulators)?",
+            key="rep_risk"
+        )
+        
 
     st.divider()
 

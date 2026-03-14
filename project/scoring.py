@@ -16,29 +16,29 @@ TOP_WEAK_DOMAINS = 2
 
 DOMAIN_RECOMMENDATIONS = {
     "Identify": [
-        "Create and maintain a simple asset and data inventory covering key accounts, devices, systems, and sensitive information.",
-        "Define and review access responsibilities so the charity knows who can access which systems and data.",
-        "Document the use of personal devices and external accounts where they are used to access charity resources."
+        "Create and maintain a simple inventory of charity devices, accounts, systems, and sensitive data such as donor, beneficiary, and finance records.",
+        "Define who is responsible for cyber-risk oversight and review which staff or volunteers can access important systems and data.",
+        "Document where charity information is stored and whether personal devices or third-party accounts are being used to access it."
     ],
     "Protect": [
-        "Apply stronger account protections, including unique accounts, password guidance, and multi-factor authentication where available.",
-        "Introduce short, repeatable phishing-awareness guidance for staff and volunteers.",
-        "Use access controls, permissions, and secure storage practices to reduce exposure of donor, beneficiary, and financial data."
+        "Strengthen access security by enabling multi-factor authentication on email, cloud storage, and other important charity systems where possible.",
+        "Apply clear password and account management rules, including unique accounts, appropriate permissions, and regular access review.",
+        "Provide short, practical phishing-awareness guidance for staff and volunteers, especially where donor or financial data is handled."
     ],
     "Detect": [
-        "Enable basic monitoring and alerting for important accounts, especially email and cloud platforms.",
-        "Define simple checking procedures when suspicious activity is reported, such as reviewing logins or resetting passwords.",
-        "Establish a clear and visible reporting route for suspected cyber-security issues."
+        "Enable basic alerts and monitoring for important accounts, particularly email and cloud platforms used for charity operations.",
+        "Define simple checks for suspicious activity, such as reviewing unusual logins, verifying messages, and resetting compromised accounts.",
+        "Ensure there is a clear reporting route so staff and volunteers know how to raise suspected cyber-security concerns quickly."
     ],
     "Respond": [
-        "Develop a short incident response checklist covering phishing, account compromise, and data-loss scenarios.",
-        "Assign a named incident coordinator who can organise actions and escalation during an event.",
-        "Record incident actions and decisions to support evidence, review, and learning."
+        "Create a short incident response checklist covering common scenarios such as phishing, account compromise, and data loss.",
+        "Assign a named person or role to coordinate incident handling, escalation, and communication during a cyber event.",
+        "Keep a basic incident record of what happened, what actions were taken, and what follow-up improvements are needed."
     ],
     "Recover": [
-        "Ensure important data is backed up and that backups can be accessed when needed.",
-        "Define how essential services would be restored after an incident, including realistic recovery priorities.",
-        "Review incidents and near-misses after they occur and update practices accordingly."
+        "Ensure important charity data is backed up and that backup access is understood before an incident occurs.",
+        "Define how key services such as email, donor systems, or finance records would be restored after disruption.",
+        "Review incidents and near-misses to identify lessons learned, update responsibilities, and improve future recovery readiness."
     ]
 }
 
@@ -122,16 +122,32 @@ def rank_weak_domains(domain_scores):
 
 def generate_recommendations(domain_scores):
     """
-    Generate practical recommendations based on the weakest domains.
+    Generate structured recommendations based on the weakest domains.
+
+    Rules:
+    - Rank domains by weakness
+    - If all domains are already strong, return no urgent recommendations
+    - Otherwise return grouped recommendations for the two weakest domains
     """
     ranked = rank_weak_domains(domain_scores)
-    weakest_domains = [domain for domain, _ in ranked[:TOP_WEAK_DOMAINS]]
 
-    recs = []
-    for domain in weakest_domains:
-        recs.extend(DOMAIN_RECOMMENDATIONS.get(domain, []))
+    # If the strongest recommendation need is very small, do not force priorities
+    if ranked[0][1] <= 0.5:
+        return []
 
-    return recs
+    weakest_domains = ranked[:TOP_WEAK_DOMAINS]
+
+    grouped_recommendations = []
+
+    for priority, (domain, weakness) in enumerate(weakest_domains, start=1):
+        grouped_recommendations.append({
+            "priority": priority,
+            "domain": domain,
+            "weakness": weakness,
+            "recommendations": DOMAIN_RECOMMENDATIONS.get(domain, [])
+        })
+
+    return grouped_recommendations
 
 
 def run_assessment(responses, domain_question_ids, context, domain_weights=None):

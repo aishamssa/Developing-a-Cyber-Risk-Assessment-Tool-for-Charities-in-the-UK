@@ -205,15 +205,24 @@ with tab2:
             f"Interpretation: your highest exposure is currently **{top_domain}**. "
             "Improving controls in the weakest domain(s) should reduce likelihood and overall risk score."
         )
+        
+        st.subheader("Priority recommendations")
+        with st.container(border=True):
+            if not result["recommendations"]:
+                st.success("No urgent priority recommendations were identified from the current assessment.")
+            else:
+                for index, item in enumerate(result["recommendations"]):
+                    st.markdown(f"### Priority {item['priority']}: {item['domain']}")
+                    st.caption(f"Weakness score: {item['weakness']:.2f}")
 
-        st.subheader("Recommendations")
-        try:
-            with st.container(border=True):
-                for r in result["recommendations"]:
-                    st.write(f" {r}")
-        except TypeError:
-            for r in result["recommendations"]:
-                st.info(r)
+                    for rec in item["recommendations"]:
+                        st.write(f"• {rec}")
+
+                    if index < len(result["recommendations"]) - 1:
+                        st.divider()
+            
+            if index < len(result["recommendations"]) - 1:
+                st.divider()
 
         st.subheader("Export evidence")
         export_payload = {
@@ -287,7 +296,7 @@ This decision was made because, in small and scaling charities, responses can va
 **Streamlit** was selected because it supports rapid prototyping, clear visual presentation, and interactive input collection with relatively low development overhead. This made it suitable for building a lightweight academic prototype that could display scores, charts, rankings, and downloadable evidence in a simple browser-based interface.
 
 ### How to interpret results
-- **0 - 4 maturity scale** indicates how far a control is in place
+- **0 -4 maturity scale** indicates how far a control is in place
 - lower maturity produces higher weakness
 - higher weakness increases estimated likelihood
 - the weakest domains are ranked to help prioritise improvement efforts

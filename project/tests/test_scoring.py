@@ -117,7 +117,16 @@ def test_generate_recommendations_uses_top_two_domains():
 
     recs = generate_recommendations(domain_scores)
 
-    assert len(recs) == 6
+    assert len(recs) == 2
+    assert recs[0]["domain"] == "Protect"
+    assert recs[0]["priority"] == 1
+    assert recs[0]["weakness"] == 4
+    assert len(recs[0]["recommendations"]) == 3
+
+    assert recs[1]["domain"] == "Detect"
+    assert recs[1]["priority"] == 2
+    assert recs[1]["weakness"] == 3
+    assert len(recs[1]["recommendations"]) == 3
 
 
 def test_run_assessment_returns_expected_keys():
@@ -180,6 +189,7 @@ def test_run_assessment_with_balanced_inputs():
         "financial_exposure": 1,
         "reputational_risk": 1,
     }
+
 
     result = run_assessment(responses, domain_question_ids, context)
 

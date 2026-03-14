@@ -211,6 +211,8 @@ with tab2:
 
             st.altair_chart(chart, use_container_width=True)
 
+        st.subheader("Domain maturity and weakness summary")
+
         combined_df = domain_df.join(weakness_df)
         st.dataframe(combined_df.style.format("{:.2f}"), use_container_width=True)
 

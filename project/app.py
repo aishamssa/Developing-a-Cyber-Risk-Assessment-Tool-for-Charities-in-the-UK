@@ -160,13 +160,13 @@ with tab2:
         domain_df = pd.DataFrame.from_dict(
             result["domain_scores"],
             orient="index",
-            columns=["Maturity (0-4)"]
+            columns=["Maturity (0 - 4)"]
         )
         domain_df.index.name = "Domain"
 
         weakness_df = domain_df.copy()
-        weakness_df["Weakness (0-4)"] = 4 - weakness_df["Maturity (0-4)"]
-        weakness_df = weakness_df[["Weakness (0-4)"]]
+        weakness_df["Weakness (0 - 4)"] = 4 - weakness_df["Maturity (0 - 4)"]
+        weakness_df = weakness_df[["Weakness (0 - 4)"]]
 
         chart_df = weakness_df.reset_index()
         chart_df.columns = ["Domain", "Weakness"]
@@ -195,10 +195,10 @@ with tab2:
         st.dataframe(combined_df.style.format("{:.2f}"), use_container_width=True)
 
         st.subheader("Weakest areas (priority order)")
-        weak_df = pd.DataFrame(result["weak_domain_ranking"], columns=["Domain", "Weakness (0–4)"])
+        weak_df = pd.DataFrame(result["weak_domain_ranking"], columns=["Domain", "Weakness (0 - 4)"])
         weak_df.index = range(1, len(weak_df) + 1)
         weak_df.index.name = "Priority"
-        st.dataframe(weak_df.style.format({"Weakness (0–4)": "{:.2f}"}), use_container_width=True)
+        st.dataframe(weak_df.style.format({"Weakness (0 - 4)": "{:.2f}"}), use_container_width=True)
 
         top_domain = weak_df.iloc[0]["Domain"]
         st.info(
@@ -210,7 +210,7 @@ with tab2:
         try:
             with st.container(border=True):
                 for r in result["recommendations"]:
-                    st.write(f"• {r}")
+                    st.write(f" {r}")
         except TypeError:
             for r in result["recommendations"]:
                 st.info(r)
@@ -245,7 +245,7 @@ This prototype was developed to support **small UK charities** in identifying cy
 Many charities face growing exposure to threats such as **phishing, credential compromise, ransomware, and unauthorised access to donor or beneficiary data**, yet often operate without dedicated cyber-security staff. In these environments, complex enterprise frameworks may be difficult to apply directly. This tool therefore translates key cyber-risk concepts into a lightweight self-assessment that can support early prioritisation of improvements.
 
 ### Purpose of the tool
-The aim of the tool is to help a charity, trustee, senior manager, or assessor form an indicative view of the organisation’s current cyber-risk posture by combining:
+The aim of the tool is to help a charity, trustee, senior manager, or assessor form an indicative view of the organisation's current cyber-risk posture by combining:
 - **control maturity** across five core cyber-security functions
 - **organisational impact context**
 - a simple **risk scoring model** that turns responses into prioritised outputs
@@ -287,7 +287,7 @@ This decision was made because, in small and scaling charities, responses can va
 **Streamlit** was selected because it supports rapid prototyping, clear visual presentation, and interactive input collection with relatively low development overhead. This made it suitable for building a lightweight academic prototype that could display scores, charts, rankings, and downloadable evidence in a simple browser-based interface.
 
 ### How to interpret results
-- **0–4 maturity scale** indicates how far a control is in place
+- **0 - 4 maturity scale** indicates how far a control is in place
 - lower maturity produces higher weakness
 - higher weakness increases estimated likelihood
 - the weakest domains are ranked to help prioritise improvement efforts

@@ -70,7 +70,7 @@ def weakness_color(v: float) -> str:
     Map weakness score (0..4) to a friendly risk colour.
     Higher weakness = worse = warmer colour.
     """
-    if v >= 3.5: return "#B91C1C"  # deep red
+    if v >= 3.5: return "#E11E1E"  #  red
     if v >= 2.5: return "#F97316"  # orange
     if v >= 1.5: return "#EAB308"  # yellow
     return "#16A34A"               # green

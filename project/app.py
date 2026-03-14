@@ -121,7 +121,7 @@ with tab1:
                     step=1,
                     key=q["id"]
                 )
-                st.caption(f"**Selected:** {value} - {SCALE_LABELS[value]}")
+                st.caption(f"**Selected:** {value}  {SCALE_LABELS[value]}")
 
 
 # -------------------------
@@ -214,15 +214,9 @@ with tab2:
                 for index, item in enumerate(result["recommendations"]):
                     st.markdown(f"### Priority {item['priority']}: {item['domain']}")
                     st.caption(f"Weakness score: {item['weakness']:.2f}")
-
-                    for rec in item["recommendations"]:
-                        st.write(f"• {rec}")
-
-                    if index < len(result["recommendations"]) - 1:
-                        st.divider()
-            
-            if index < len(result["recommendations"]) - 1:
-                st.divider()
+                for rec in item["recommendations"]:
+                    st.write(f"- {rec}")
+            if index < len(result["recommendations"]) - 1:st.divider()
 
         st.subheader("Export evidence")
         export_payload = {

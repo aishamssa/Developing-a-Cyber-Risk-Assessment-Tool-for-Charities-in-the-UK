@@ -132,6 +132,9 @@ def generate_recommendations(domain_scores):
     ranked = rank_weak_domains(domain_scores)
 
     # If the strongest recommendation need is very small, do not force priorities
+    if not ranked:
+        return []
+
     if ranked[0][1] <= 0.5:
         return []
 

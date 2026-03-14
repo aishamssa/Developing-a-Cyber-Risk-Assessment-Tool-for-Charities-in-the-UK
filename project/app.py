@@ -109,7 +109,7 @@ with tab1:
 
     with st.expander("What do the scores mean? (0-4)", expanded=False):
         for k in range(0, 5):
-            st.write(f"**{k}** — {SCALE_LABELS[k]}")
+            st.write(f"**{k}** - {SCALE_LABELS[k]}")
 
     for domain, questions in QUESTIONNAIRE.items():
         with st.expander(domain, expanded=True):
@@ -121,7 +121,7 @@ with tab1:
                     step=1,
                     key=q["id"]
                 )
-                st.caption(f"**Selected:** {value} — {SCALE_LABELS[value]}")
+                st.caption(f"**Selected:** {value} - {SCALE_LABELS[value]}")
 
 
 # -------------------------
@@ -181,7 +181,7 @@ with tab2:
                     "Weakness:Q",
                     scale=alt.Scale(
                         domain=[0, 1.5, 2.5, 3.5, 4],
-                        range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#7F1D1D"],
+                        range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#B32C2C"],
                     ),
                     legend=alt.Legend(title="Weakness"),
                 ),

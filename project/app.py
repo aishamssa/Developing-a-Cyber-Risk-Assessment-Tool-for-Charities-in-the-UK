@@ -102,6 +102,23 @@ with tab1:
                 key="rep_risk"
             )
 
+    if st.button("Reset assessment"):
+        default_ctx = default_charity_context()
+
+        st.session_state["charity_name"] = default_ctx["charity_name"]
+        st.session_state["data_sens"] = default_ctx["data_sensitivity"]
+        st.session_state["fin_exp"] = default_ctx["financial_exposure"]
+        st.session_state["ops_dep"] = default_ctx["operational_dependency"]
+        st.session_state["rep_risk"] = default_ctx["reputational_risk"]
+
+        for domain, questions in QUESTIONNAIRE.items():
+            for q in questions:
+                st.session_state[q["id"]] = 0
+
+        st.session_state.result = None
+        st.session_state.last_calculated = None
+        st.rerun()
+
     st.divider()
 
     st.subheader("Questionnaire (0 = not in place, 4 = fully in place)")
@@ -117,7 +134,6 @@ with tab1:
                 value = st.slider(
                     f"{q['id']} - {q['question']}",
                     0, 4,
-                    value=int(st.session_state[q["id"]]),
                     step=1,
                     key=q["id"]
                 )

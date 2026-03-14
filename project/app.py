@@ -171,25 +171,28 @@ with tab2:
         chart_df = weakness_df.reset_index()
         chart_df.columns = ["Domain", "Weakness"]
 
-        chart = (
-            alt.Chart(chart_df)
-            .mark_bar()
-            .encode(
-                x=alt.X("Domain:N", sort="-y"),
-                y=alt.Y("Weakness:Q", scale=alt.Scale(domain=[0, 4])),
-                color=alt.Color(
-                    "Weakness:Q",
-                    scale=alt.Scale(
-                        domain=[0, 1.5, 2.5, 3.5, 4],
-                        range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#B32C2C"],
+        if chart_df["Weakness"].sum() == 0:
+            st.success("All domains are currently at maximum maturity. Weakness values are 0 across the assessment.")
+        else:
+            chart = (
+                alt.Chart(chart_df)
+                .mark_bar()
+                .encode(
+                    x=alt.X("Domain:N", sort="-y"),
+                    y=alt.Y("Weakness:Q", scale=alt.Scale(domain=[0, 4])),
+                    color=alt.Color(
+                        "Weakness:Q",
+                        scale=alt.Scale(
+                            domain=[0, 1.5, 2.5, 3.5, 4],
+                            range=["#16A34A", "#EAB308", "#F97316", "#B91C1C", "#7F1D1D"],
+                        ),
+                        legend=alt.Legend(title="Weakness"),
                     ),
-                    legend=alt.Legend(title="Weakness"),
-                ),
-                tooltip=["Domain:N", "Weakness:Q"],
+                    tooltip=["Domain:N", "Weakness:Q"],
+                )
             )
-        )
 
-        st.altair_chart(chart, use_container_width=True)
+            st.altair_chart(chart, use_container_width=True)
 
         combined_df = domain_df.join(weakness_df)
         st.dataframe(combined_df.style.format("{:.2f}"), use_container_width=True)
@@ -205,8 +208,9 @@ with tab2:
             f"Interpretation: your highest exposure is currently **{top_domain}**. "
             "Improving controls in the weakest domain(s) should reduce likelihood and overall risk score."
         )
-        
+
         st.subheader("Priority recommendations")
+
         with st.container(border=True):
             if not result["recommendations"]:
                 st.success("No urgent priority recommendations were identified from the current assessment.")
@@ -214,9 +218,12 @@ with tab2:
                 for index, item in enumerate(result["recommendations"]):
                     st.markdown(f"### Priority {item['priority']}: {item['domain']}")
                     st.caption(f"Weakness score: {item['weakness']:.2f}")
-                for rec in item["recommendations"]:
-                    st.write(f"- {rec}")
-            if index < len(result["recommendations"]) - 1:st.divider()
+
+                    for rec in item["recommendations"]:
+                        st.write(f"- {rec}")
+
+                    if index < len(result["recommendations"]) - 1:
+                        st.divider()
 
         st.subheader("Export evidence")
         export_payload = {

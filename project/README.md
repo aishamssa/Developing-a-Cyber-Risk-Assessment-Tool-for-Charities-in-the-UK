@@ -7,13 +7,13 @@ University of Hertfordshire
 
 ## Live Application
 Streamlit App:  
-[PASTE YOUR STREAMLIT LINK HERE]
+https://developing-a-cyber-risk-assessment-tool-for-charities-in-the-uk.streamlit.app/
 
 ---
 
 ## Source Code
 GitHub Repository:  
-[PASTE YOUR GITHUB LINK HERE]
+(https://github.com/aishamssa/Developing-a-Cyber-Risk-Assessment-Tool-for-Charities-in-the-UK)
 
 ---
 

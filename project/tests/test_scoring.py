@@ -1,4 +1,3 @@
-
 import pytest
 
 from scoring import (
@@ -11,6 +10,10 @@ from scoring import (
     generate_recommendations,
     run_assessment,
 )
+
+# these tests focus on the scoring layer only
+# i kept testing separate from the streamlit app so the core risk logic
+# could be checked independently and more reliably
 
 
 def test_domain_score_calculation():
@@ -34,6 +37,8 @@ def test_likelihood_calculation():
 
 
 def test_likelihood_with_weights():
+    # this checks that weighting can change likelihood if some domains
+    # are treated as more important than others
     domain_scores = {
         "Identify": 4,
         "Protect": 2,
@@ -67,6 +72,7 @@ def test_risk_calculation():
     assert risk == 9
 
 
+# simple threshold tests to make sure interpretation stays consistent
 def test_risk_band_low():
     assert risk_band(2) == "Low"
 
@@ -107,6 +113,8 @@ def test_generate_recommendations_returns_output():
 
 
 def test_generate_recommendations_uses_top_two_domains():
+    # recommendation logic is intentionally limited to the top two weak domains
+    # so smaller charities are not overwhelmed with too many actions at once
     domain_scores = {
         "Identify": 4,
         "Protect": 0,
@@ -130,6 +138,8 @@ def test_generate_recommendations_uses_top_two_domains():
 
 
 def test_run_assessment_returns_expected_keys():
+    # this checks the full scoring pipeline returns the structure
+    # the streamlit app expects to display
     responses = {
         "ID1": 2, "ID2": 2, "ID3": 2, "ID4": 2,
         "PR1": 2, "PR2": 2, "PR3": 2, "PR4": 2,
@@ -166,6 +176,7 @@ def test_run_assessment_returns_expected_keys():
 
 
 def test_run_assessment_with_balanced_inputs():
+    # this represents a low-risk case where maturity is strong across all domains
     responses = {
         "ID1": 4, "ID2": 4, "ID3": 4, "ID4": 4,
         "PR1": 4, "PR2": 4, "PR3": 4, "PR4": 4,
@@ -189,7 +200,6 @@ def test_run_assessment_with_balanced_inputs():
         "financial_exposure": 1,
         "reputational_risk": 1,
     }
-
 
     result = run_assessment(responses, domain_question_ids, context)
 

@@ -1,8 +1,10 @@
 # questionnaire.py
-# Defines the questionnaire structure and maturity scale used by the tool.
-# Questions are organised according to the NIST CSF domains
-# (Identify, Protect, Detect, Respond, Recover).
 
+# defines the questionnaire structure + maturity scale
+# i kept this separate so i could tweak wording + domains without touching scoring logic
+
+# i went with a 0–4 maturity scale instead of yes/no because charities
+# often have things “kind of in place” rather than fully implemented
 SCALE_LABELS = {
     0: "Not in place (no evidence, not done)",
     1: "Ad hoc (done sometimes, inconsistent, depends on individuals)",
@@ -11,6 +13,8 @@ SCALE_LABELS = {
     4: "Fully (consistent, documented, reviewed/improved)",
 }
 
+
+# Identify = understanding assets + data (foundation of everything in NIST)
 identify_questions = [
     {
         "id": "ID1",
@@ -20,6 +24,8 @@ identify_questions = [
         ),
         "scale": "0-4"
     },
+
+    # access control over time (people join/leave = common weak point)
     {
         "id": "ID2",
         "question": (
@@ -27,6 +33,8 @@ identify_questions = [
         ),
         "scale": "0-4"
     },
+
+    # important for BYOD reality in charities
     {
         "id": "ID3",
         "question": (
@@ -35,6 +43,8 @@ identify_questions = [
         ),
         "scale": "0-4"
     },
+
+    # keeps responsibility from being “everyone’s job = no one’s job”
     {
         "id": "ID4",
         "question": (
@@ -44,6 +54,8 @@ identify_questions = [
     },
 ]
 
+
+# Protect = preventing issues before they happen
 protect_questions = [
     {
         "id": "PR1",
@@ -53,6 +65,8 @@ protect_questions = [
         ),
         "scale": "0-4"
     },
+
+    # phishing is literally the most common threat → had to include
     {
         "id": "PR2",
         "question": (
@@ -61,6 +75,7 @@ protect_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "PR3",
         "question": (
@@ -69,6 +84,8 @@ protect_questions = [
         ),
         "scale": "0-4"
     },
+
+    # patching but phrased in a non-technical way
     {
         "id": "PR4",
         "question": (
@@ -79,6 +96,8 @@ protect_questions = [
     },
 ]
 
+
+# Detect = noticing when something goes wrong (often weakest in small orgs)
 detect_questions = [
     {
         "id": "DE1",
@@ -88,6 +107,8 @@ detect_questions = [
         ),
         "scale": "0-4"
     },
+
+    # what people actually *do* when something looks off
     {
         "id": "DE2",
         "question": (
@@ -96,6 +117,7 @@ detect_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "DE3",
         "question": (
@@ -104,6 +126,7 @@ detect_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "DE4",
         "question": (
@@ -114,6 +137,8 @@ detect_questions = [
     },
 ]
 
+
+# Respond = what happens DURING an incident
 respond_questions = [
     {
         "id": "RS1",
@@ -123,6 +148,7 @@ respond_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RS2",
         "question": (
@@ -130,6 +156,7 @@ respond_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RS3",
         "question": (
@@ -138,6 +165,7 @@ respond_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RS4",
         "question": (
@@ -148,6 +176,8 @@ respond_questions = [
     },
 ]
 
+
+# Recover = getting back to normal after impact
 recover_questions = [
     {
         "id": "RC1",
@@ -156,6 +186,7 @@ recover_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RC2",
         "question": (
@@ -164,6 +195,7 @@ recover_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RC3",
         "question": (
@@ -172,6 +204,7 @@ recover_questions = [
         ),
         "scale": "0-4"
     },
+
     {
         "id": "RC4",
         "question": (
@@ -181,6 +214,9 @@ recover_questions = [
     },
 ]
 
+
+# grouping like this lets me loop through domains in the UI
+# and also reuse the same structure in scoring without duplication
 QUESTIONNAIRE = {
     "Identify": identify_questions,
     "Protect": protect_questions,
@@ -189,9 +225,9 @@ QUESTIONNAIRE = {
     "Recover": recover_questions
 }
 
+
+# auto-generating this avoids hardcoding question mappings in multiple places
 DOMAIN_QUESTION_IDS = {
     domain: [q["id"] for q in questions]
     for domain, questions in QUESTIONNAIRE.items()
 }
-
-

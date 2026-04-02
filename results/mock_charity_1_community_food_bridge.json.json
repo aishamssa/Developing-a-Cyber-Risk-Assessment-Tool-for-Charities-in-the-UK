@@ -1,0 +1,90 @@
+{
+  "tool_name": "Cyber Risk Assessment Tool (UK Charities)",
+  "last_calculated_utc": "2026-02-18 09:07:50 UTC",
+  "charity_context": {
+    "charity_name": "Community Food Bridge",
+    "data_sensitivity": 2,
+    "operational_dependency": 2,
+    "financial_exposure": 1,
+    "reputational_risk": 3
+  },
+  "responses": {
+    "ID1": 1,
+    "ID2": 1,
+    "ID3": 0,
+    "ID4": 0,
+    "PR1": 1,
+    "PR2": 1,
+    "PR3": 1,
+    "PR4": 1,
+    "DE1": 0,
+    "DE2": 0,
+    "DE3": 1,
+    "DE4": 1,
+    "RS1": 0,
+    "RS2": 0,
+    "RS3": 0,
+    "RS4": 0,
+    "RC1": 1,
+    "RC2": 0,
+    "RC3": 0,
+    "RC4": 0
+  },
+  "result": {
+    "domain_scores": {
+      "Identify": 0.5,
+      "Protect": 1.0,
+      "Detect": 0.5,
+      "Respond": 0.0,
+      "Recover": 0.25
+    },
+    "likelihood": 3.55,
+    "impact": 2.0,
+    "risk_score": 7.1,
+    "risk_band": "Medium",
+    "weak_domain_ranking": [
+      [
+        "Respond",
+        4.0
+      ],
+      [
+        "Recover",
+        3.75
+      ],
+      [
+        "Identify",
+        3.5
+      ],
+      [
+        "Detect",
+        3.5
+      ],
+      [
+        "Protect",
+        3.0
+      ]
+    ],
+    "recommendations": [
+      {
+        "priority": 1,
+        "domain": "Respond",
+        "weakness": 4.0,
+        "recommendations": [
+          "Create a short incident response checklist covering common scenarios such as phishing, account compromise, and data loss.",
+          "Assign a named person or role to coordinate incident handling, escalation, and communication during a cyber event.",
+          "Keep a basic incident record of what happened, what actions were taken, and what follow-up improvements are needed."
+        ]
+      },
+      {
+        "priority": 2,
+        "domain": "Recover",
+        "weakness": 3.75,
+        "recommendations": [
+          "Ensure important charity data is backed up and that backup access is understood before an incident occurs.",
+          "Define how key services such as email, donor systems, or finance records would be restored after disruption.",
+          "Review incidents and near-misses to identify lessons learned, update responsibilities, and improve future recovery readiness."
+        ]
+      }
+    ]
+  }
+}

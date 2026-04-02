@@ -1,6 +1,6 @@
 # app.py
-# Cyber Risk Assessment Tool (UK Charities)
-# Author: Aisha Moussa
+# cyber risk assessment tool (uk charities)
+# author: aisha moussa
 
 import json
 import streamlit as st
@@ -13,32 +13,30 @@ from charity_profile import default_charity_context
 from scoring import run_assessment
 
 
-# -------------------------
-# Page setup
-# -------------------------
+# page setup
+# kept this simple and wide because the app has questionnaire, metrics, tables, and charts
 st.set_page_config(page_title="Cyber Risk Assessment Tool", layout="wide")
 apply_styles()
 hero_card()
 
-# -------------------------
-# Session state
-# -------------------------
+
+# streamlit reruns the script whenever widgets change,
+# so i used session state to stop results disappearing between interactions
 if "result" not in st.session_state:
     st.session_state.result = None
 
 if "last_calculated" not in st.session_state:
     st.session_state.last_calculated = None
 
-# -------------------------
-# Tabs (main navigation)
-# -------------------------
+
+# splitting the app into tabs made the flow clearer:
+# assessment first, then results, then background/context
 tab1, tab2, tab3 = st.tabs(["Assessment", "Results", "About"])
 
 
-# -------------------------
-# Helper: build context from session state
-# -------------------------
 def build_ctx_from_state() -> dict:
+    # this rebuilds the charity context from current widget values
+    # so scoring always uses the latest impact inputs
     ctx_local = default_charity_context()
 
     ctx_local["charity_name"] = st.session_state.get("charity_name", ctx_local["charity_name"])
@@ -51,6 +49,8 @@ def build_ctx_from_state() -> dict:
 
 
 def reset_assessment():
+    # reset puts the app back into a clean starting state
+    # useful when testing different scenarios without leftover values
     default_ctx = default_charity_context()
 
     st.session_state["charity_name"] = default_ctx["charity_name"]
@@ -67,26 +67,27 @@ def reset_assessment():
     st.session_state["last_calculated"] = None
 
 
-# -------------------------
-# Build responses dict from session_state
-# -------------------------
+# rebuilding responses from session state means the scoring layer always gets
+# a clean question-id -> score mapping based on the latest slider values
 responses = {}
 for domain, questions in QUESTIONNAIRE.items():
     for q in questions:
         if q["id"] not in st.session_state:
-            st.session_state[q["id"]] = 0  # default "not in place" to avoid biased demo outputs
+            # defaulting to 0 avoids inflated scores from unanswered items
+            st.session_state[q["id"]] = 0
         responses[q["id"]] = st.session_state[q["id"]]
 
 
-# -------------------------
-# TAB 1: Assessment
-# -------------------------
+# tab 1 = inputs only
+# i wanted the assessment stage to feel focused, not mixed with outputs
 with tab1:
     st.header("Assessment")
     st.caption("Tip: answer honestly. This is an indicative self-assessment, not a compliance audit.")
 
     st.subheader("Charity context (Impact inputs)")
     with st.container(border=True):
+        # context is separated from the questionnaire because impact is meant
+        # to capture charity-level consequence, not control maturity
         ctx_preview = default_charity_context()
 
         st.text_input("Charity name", value=ctx_preview["charity_name"], key="charity_name")
@@ -131,6 +132,7 @@ with tab1:
             st.write(f"**{k}** - {SCALE_LABELS[k]}")
 
     for domain, questions in QUESTIONNAIRE.items():
+        # each domain is shown separately so the questionnaire feels less overwhelming
         with st.expander(domain, expanded=True):
             for q in questions:
                 value = st.slider(
@@ -141,15 +143,16 @@ with tab1:
                 )
                 st.caption(f"Selected: {value} - {SCALE_LABELS[value]}")
 
-# -------------------------
-# TAB 2: Results
-# -------------------------
+
+# tab 2 = outputs + interpretation
 with tab2:
     st.header("Results")
 
     ctx = build_ctx_from_state()
 
     if st.button("Calculate risk score", key="calc_risk"):
+        # main handoff into scoring.py
+        # keeping scoring outside app.py made the model easier to test and explain
         st.session_state.result = run_assessment(
             responses=responses,
             domain_question_ids=DOMAIN_QUESTION_IDS,
@@ -181,6 +184,8 @@ with tab2:
         )
         domain_df.index.name = "Domain"
 
+        # converting maturity into weakness here makes the chart line up more clearly
+        # with how likelihood is actually calculated in scoring.py
         weakness_df = domain_df.copy()
         weakness_df["Weakness (0 - 4)"] = 4 - weakness_df["Maturity (0 - 4)"]
         weakness_df = weakness_df[["Weakness (0 - 4)"]]
@@ -191,6 +196,8 @@ with tab2:
         if chart_df["Weakness"].sum() == 0:
             st.success("All domains are currently at maximum maturity. Weakness values are 0 across the assessment.")
         else:
+            # i used a simple bar chart because it is quicker to read than a table,
+            # especially for non-technical users trying to spot weak areas fast
             chart = (
                 alt.Chart(chart_df)
                 .mark_bar()
@@ -253,6 +260,8 @@ with tab2:
             "result": result
         }
 
+        # exporting both inputs and results makes the assessment more useful
+        # beyond the screen, especially for review, comparison, or evidence
         st.download_button(
             "Download results (JSON)",
             data=json.dumps(export_payload, indent=2),
@@ -262,9 +271,7 @@ with tab2:
         )
 
 
-# -------------------------
-# TAB 3: About
-# -------------------------
+# tab 3 gives the user context of the purpose and what 5 my tool is about
 with tab3:
     st.header("About this tool")
     st.write(
@@ -285,7 +292,6 @@ This assessment is intended to be completed by someone with a **broad understand
 The questions focus on **organisational practices rather than individual staff knowledge**. Where exact information is not available, respondents should provide a **best effort estimate** based on current processes, documentation, and operational understanding.
 
 The goal of the tool is **not to produce a precise compliance score**, but to highlight areas where cyber-security maturity may require further attention.
-
 
 ### Framework basis
 The questionnaire is structured around the five core functions of **NIST CSF 2.0**:

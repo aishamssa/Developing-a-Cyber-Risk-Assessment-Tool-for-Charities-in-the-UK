@@ -1,18 +1,17 @@
 # scoring.py
-# Risk scoring engine for the Cyber Risk Assessment Tool.
-# Implements a simplified NIST SP 800-30 inspired model:
-# Risk = Likelihood x Impact.
-#
-# Likelihood is derived from questionnaire maturity scores
-# across the NIST CSF domains (Identify, Protect, Detect,
-# Respond, Recover). Impact is estimated from organisational
-# context factors such as data sensitivity, operational
-# dependency, financial exposure, and reputational risk.
+
+# risk scoring engine for the tool
+# this is where questionnaire maturity gets turned into likelihood, impact, and overall risk
+
+# i kept the scoring logic separate from the streamlit app so it could be
+# tested independently and changed without breaking the ui
 
 MAX_SCORE = 4
 LOW_RISK_THRESHOLD = 4
 MEDIUM_RISK_THRESHOLD = 9
 TOP_WEAK_DOMAINS = 2
+
+# current thresholds are intentionally simple for interpretability in the prototype version
 
 DOMAIN_RECOMMENDATIONS = {
     "Identify": [
@@ -42,12 +41,13 @@ DOMAIN_RECOMMENDATIONS = {
     ]
 }
 
+
 def calculate_domain_scores(responses, domain_question_ids):
     """
     Calculates average maturity per CSF domain.
-    responses: dict like {"ID1": 3, "PR1": 2, ...}
-    domain_question_ids: dict like {"Identify": ["ID1","ID2"], ...}
     """
+    # averaging at domain level makes the output easier to interpret than
+    # treating every question as a separate result
     domain_scores = {}
     for domain, qids in domain_question_ids.items():
         scores = [responses[qid] for qid in qids]
@@ -57,10 +57,10 @@ def calculate_domain_scores(responses, domain_question_ids):
 
 def calculate_likelihood(domain_scores, domain_weights=None):
     """
-    Converts maturity into a likelihood estimate on the same scale as the questionnaire.
-    Weakness is calculated as MAX_SCORE minus maturity.
-    A weighted average of weakness values produces the likelihood score.
+    Converts maturity into a likelihood estimate.
     """
+    # for this prototype i kept weights optional because equal weighting keeps
+    # the model simple + easier to explain, but it could be extended later
     if domain_weights is None:
         domain_weights = {d: 1 for d in domain_scores.keys()}
 
@@ -68,6 +68,7 @@ def calculate_likelihood(domain_scores, domain_weights=None):
     weighted_weakness = 0
 
     for domain, maturity in domain_scores.items():
+        # lower maturity should increase likelihood, so i invert it into weakness
         weakness = MAX_SCORE - maturity
         weighted_weakness += weakness * domain_weights.get(domain, 1)
 
@@ -78,8 +79,9 @@ def calculate_likelihood(domain_scores, domain_weights=None):
 def calculate_impact(context):
     """
     Estimates impact from charity context factors.
-    All context values use the same 0- MAX_SCORE scale and are averaged.
     """
+    # impact is kept separate because two charities can have similar gaps
+    # but very different consequences if something goes wrong
     factors = [
         context["data_sensitivity"],
         context["operational_dependency"],
@@ -92,15 +94,18 @@ def calculate_impact(context):
 
 def calculate_risk(likelihood, impact):
     """
-    Calculates the overall risk score as likelihood x impact.
+    Calculates overall risk score.
     """
+    # simplified version of nist sp 800-30:
+    # not full threat modelling, but enough for a usable prototype
     return round(likelihood * impact, 2)
 
 
 def risk_band(risk_score):
     """
-    Categorises risk score into user-friendly bands.
+    Categorises risk into bands.
     """
+    # bands make results easier to understand in the ui
     if risk_score < LOW_RISK_THRESHOLD:
         return "Low"
     elif risk_score < MEDIUM_RISK_THRESHOLD:
@@ -110,34 +115,31 @@ def risk_band(risk_score):
 
 def rank_weak_domains(domain_scores):
     """
-    Returns list of (domain, weakness) sorted worst-first.
+    Sorts domains by weakness (worst first).
     """
     weaknesses = []
     for domain, score in domain_scores.items():
         weaknesses.append((domain, round(MAX_SCORE - score, 2)))
 
+    # sorting worst-first helps prioritise action
     weaknesses.sort(key=lambda x: x[1], reverse=True)
     return weaknesses
 
 
 def generate_recommendations(domain_scores):
     """
-    Generate structured recommendations based on the weakest domains.
-
-    Rules:
-    - Rank domains by weakness
-    - If all domains are already strong, return no urgent recommendations
-    - Otherwise return grouped recommendations for the two weakest domains
+    Generate recommendations based on weakest domains.
     """
     ranked = rank_weak_domains(domain_scores)
 
-    # If the strongest recommendation need is very small, do not force priorities
     if not ranked:
         return []
 
+    # if everything is already strong, do not force recommendations
     if ranked[0][1] <= 0.5:
         return []
 
+    # only focus on top 2 weakest domains to keep output realistic
     weakest_domains = ranked[:TOP_WEAK_DOMAINS]
 
     grouped_recommendations = []
@@ -155,15 +157,16 @@ def generate_recommendations(domain_scores):
 
 def run_assessment(responses, domain_question_ids, context, domain_weights=None):
     """
-    Main function used by Streamlit (app.py).
-    Returns a structured result dictionary for UI + reporting.
+    Main scoring pipeline used by the app.
     """
+    # keeping one main function made it easier to plug into streamlit
+    # and also easier to test the full flow with pytest
     domain_scores = calculate_domain_scores(responses, domain_question_ids)
     likelihood = calculate_likelihood(domain_scores, domain_weights=domain_weights)
     impact = calculate_impact(context)
     risk = calculate_risk(likelihood, impact)
 
-    result = {
+    return {
         "domain_scores": domain_scores,
         "likelihood": likelihood,
         "impact": impact,
@@ -172,4 +175,3 @@ def run_assessment(responses, domain_question_ids, context, domain_weights=None)
         "weak_domain_ranking": rank_weak_domains(domain_scores),
         "recommendations": generate_recommendations(domain_scores)
     }
-    return result

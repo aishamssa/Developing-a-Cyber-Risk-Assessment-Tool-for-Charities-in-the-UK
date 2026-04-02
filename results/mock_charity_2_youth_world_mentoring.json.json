@@ -1,0 +1,90 @@
+{
+  "tool_name": "Cyber Risk Assessment Tool (UK Charities)",
+  "last_calculated_utc": "2026-02-18 10:02:29 UTC",
+  "charity_context": {
+    "charity_name": "Youth World Mentoring",
+    "data_sensitivity": 4,
+    "operational_dependency": 3,
+    "financial_exposure": 2,
+    "reputational_risk": 4
+  },
+  "responses": {
+    "ID1": 3,
+    "ID2": 2,
+    "ID3": 2,
+    "ID4": 3,
+    "PR1": 2,
+    "PR2": 2,
+    "PR3": 3,
+    "PR4": 2,
+    "DE1": 1,
+    "DE2": 1,
+    "DE3": 2,
+    "DE4": 1,
+    "RS1": 1,
+    "RS2": 1,
+    "RS3": 1,
+    "RS4": 1,
+    "RC1": 2,
+    "RC2": 2,
+    "RC3": 1,
+    "RC4": 1
+  },
+  "result": {
+    "domain_scores": {
+      "Identify": 2.5,
+      "Protect": 2.25,
+      "Detect": 1.25,
+      "Respond": 1.0,
+      "Recover": 1.5
+    },
+    "likelihood": 2.3,
+    "impact": 3.25,
+    "risk_score": 7.47,
+    "risk_band": "Medium",
+    "weak_domain_ranking": [
+      [
+        "Respond",
+        3.0
+      ],
+      [
+        "Detect",
+        2.75
+      ],
+      [
+        "Recover",
+        2.5
+      ],
+      [
+        "Protect",
+        1.75
+      ],
+      [
+        "Identify",
+        1.5
+      ]
+    ],
+    "recommendations": [
+      {
+        "priority": 1,
+        "domain": "Respond",
+        "weakness": 3.0,
+        "recommendations": [
+          "Create a short incident response checklist covering common scenarios such as phishing, account compromise, and data loss.",
+          "Assign a named person or role to coordinate incident handling, escalation, and communication during a cyber event.",
+          "Keep a basic incident record of what happened, what actions were taken, and what follow-up improvements are needed."
+        ]
+      },
+      {
+        "priority": 2,
+        "domain": "Detect",
+        "weakness": 2.75,
+        "recommendations": [
+          "Enable basic alerts and monitoring for important accounts, particularly email and cloud platforms used for charity operations.",
+          "Define simple checks for suspicious activity, such as reviewing unusual logins, verifying messages, and resetting compromised accounts.",
+          "Ensure there is a clear reporting route so staff and volunteers know how to raise suspected cyber-security concerns quickly."
+        ]
+      }
+    ]
+  }
+}
